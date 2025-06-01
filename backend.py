@@ -15,20 +15,29 @@ class GeminiAPI:
         self.headers = {
             "Content-Type": "application/json"
         }
-        self.temperature = 0.7
+        self.temperature = 1
         self.max_tokens = 1000
 
     def get_response(self, prompt, conversation_history=None):
         if conversation_history is None:
             conversation_history = []
         
+        # Format the conversation history for the API
+        contents = []
+        for msg in conversation_history:
+            contents.append({
+                "role": msg["role"],
+                "parts": msg["parts"]
+            })
+        
+        # Add the current prompt
+        contents.append({
+            "role": "user",
+            "parts": [{"text": prompt}]
+        })
+        
         data = {
-            "contents": [
-                *conversation_history,
-                {
-                    "parts": [{"text": prompt}]
-                }
-            ],
+            "contents": contents,
             "generationConfig": {
                 "temperature": self.temperature,
                 "maxOutputTokens": self.max_tokens
