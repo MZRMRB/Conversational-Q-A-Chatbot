@@ -32,7 +32,15 @@ if prompt := st.chat_input("What would you like to know?"):
     # Display assistant response
     with st.chat_message("assistant"):
         with st.spinner("Thinking..."):
-            response = gemini.get_response(prompt)
+            # Convert session messages to conversation history format
+            conversation_history = []
+            for msg in st.session_state.messages[:-1]:  # Exclude the current message
+                conversation_history.append({
+                    "role": msg["role"],
+                    "parts": [{"text": msg["content"]}]
+                })
+            
+            response = gemini.get_response(prompt, conversation_history)
             st.markdown(response)
     
     # Add assistant response to chat history
